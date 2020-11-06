@@ -81,6 +81,61 @@ MPI processes. The use of the toolkit instead of a single
 monolithic function makes it easier to check the performance
 of the individual pieces.
 
+Yorick and pF3D I/O
+-----------
+
+Yorick provides an interpreted language that looks a lot like C.
+The most important differences are that Yorick array indices start
+at one instead of zero and that arrays are first class data types.
+If a and b are arrays with the same dimensions, c=a+b adds a and b
+element by element with a single interpreted instruction. This
+produces much higher performance than you can get from an interpreter
+that uses explicit loops to process arrays. If you are a Python user,
+this is the difference between having Python run loops and using Numpy.
+A number of the ideas in Numpy were borrowed from Yorick.
+
+Yorick's I/O package is written in the interpreted language.
+The I/O commands rely on compiled code to get good performance. 
+The package has automatic buffering of I/O, so the parallel file
+system only sees large block writes. Large block writes are necessary
+for getting good performance from file systems like Lustre and GPFS.
+The parallel I/O package in pF3D was carefully written so that data
+streams to disk with only a couple of fseek() calls per file.
+The parallel I/O rates for pF3D checkpointing match the IOR benchmark
+rates for most systems. If pF3D gets poor I/O rates, there is probably
+a problem with the parallel file system.
+
+The pF3D I/O package relies on MPI messages sent by the interpreter
+to coordinate I/O between different processes. The pF3D I/O package
+performed well on LLNL's Sequoia system with up to 3 million MPI processes. 
+
+The I/O rates delivered by pF3DIO are similar to those from the full pF3D.
+pF3DIO has some tuning parameters that can be set by any user and
+it is very easy to modify the benchmark for those who are familiar
+with Yorick's language.
+
+Future plans include developing a version of pF3DIO that uses Python
+instead of Yorick. There is no target date for this feature.
+
+Obtaining and installing Yorick
+-----------
+
+The repo for the yorick source code is at:
+
+https://github.com/LLNL/yorick
+
+This page has brief installation instructions. Documentation for Yorick
+is in the doc sub-directory of the repo. The yorick home page
+is on SourceForge:
+
+http://yorick.sourceforge.net
+
+The home page includes a manual, examples, ...
+
+The only tricky part about installing Yorick is probably compiling
+the mpy message passing extension. Take a look at yorick/mpy/README
+in the repo. 
+
 
 Running PF3DIO
 -----------
